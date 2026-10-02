@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Rápida de Cuotas y Conceptos Autorizados - Club Atlas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Encabezado General -->
+    <header class="py-4 text-center">
+        <h1 class="text-lg md:text-xl font-bold text-slate-700 tracking-wide">
+            Consulta rápida de cuotas y conceptos autorizados
+        </h1>
+        <!-- Botones de Sede -->
+        <div class="flex justify-center space-x-3 mt-4">
+            <button onclick="switchSede('chapalita')" id="btn-chapalita" class="sede-btn px-6 py-2 rounded-full font-bold text-sm transition-all shadow bg-red-600 text-white">Chapalita</button>
+            <button onclick="switchSede('colomos')" id="btn-colomos" class="sede-btn px-6 py-2 rounded-full font-bold text-sm transition-all shadow bg-white text-slate-700 border border-slate-300 hover:bg-slate-50">Colomos</button>
+            <button onclick="switchSede('country')" id="btn-country" class="sede-btn px-6 py-2 rounded-full font-bold text-sm transition-all shadow bg-white text-slate-700 border border-slate-300 hover:bg-slate-50">Country</button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal (Layout de 2 Columnas) -->
+    <div class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 md:grid-cols-4 gap-6 items-start max-w-6xl">
+
+        <!-- MENÚ LATERAL IZQUIERDO -->
+        <aside class="bg-slate-300 rounded-lg shadow-inner p-3 md:col-span-1 border border-slate-400">
+            <div class="bg-slate-600 text-white font-black text-center py-2.5 rounded uppercase tracking-wider mb-3 text-sm">
+                Membresías
+            </div>
+            <nav class="space-y-1.5" id="menu-membresias">
+                <!-- Botón Vitalicia -->
+                <button onclick="selectMembresia('vitalicia')" id="menu-vitalicia" class="menu-item w-full text-left bg-white font-black text-slate-900 py-3 px-4 rounded shadow-sm hover:bg-slate-50 transition border-l-4 border-red-600">
+                    VITALICIA
+                </button>
+                <!-- Botón Traspaso -->
+                <button onclick="selectMembresia('traspaso')" id="menu-traspaso" class="menu-item w-full text-left bg-white font-black text-slate-900 py-3 px-4 rounded shadow-sm hover:bg-slate-50 transition border-l-4 border-transparent">
+                    TRASPASO
+                </button>
+                
+                <!-- Menú Desplegable Temporal -->
+                <div>
+                    <button onclick="toggleTemporalSubmenu()" class="w-full text-left bg-white font-black text-slate-900 py-3 px-4 rounded shadow-sm hover:bg-slate-50 transition flex justify-between items-center border-l-4 border-transparent">
+                        <span>TEMPORAL</span>
+                        <span id="temporal-arrow" class="transform transition-transform">▼</span>
+                    </button>
+                    <!-- Submenú Temporal (Oculto por defecto, se despliega al hacer clic) -->
+                    <div id="temporal-submenu" class="pl-3 mt-1 space-y-1 hidden">
+                        <button onclick="selectMembresia('temporal-familiar')" id="menu-temporal-familiar" class="sub-item w-full text-left bg-white font-bold text-slate-800 py-2.5 px-3 rounded text-sm hover:bg-slate-100 transition">FAMILIAR</button>
+                        <button onclick="selectMembresia('temporal-pareja')" id="menu-temporal-pareja" class="sub-item w-full text-left bg-white font-bold text-slate-800 py-2.5 px-3 rounded text-sm hover:bg-slate-100 transition">PAREJA</button>
+                        <button onclick="selectMembresia('temporal-individual')" id="menu-temporal-individual" class="sub-item w-full text-left bg-white font-bold text-slate-800 py-2.5 px-3 rounded text-sm hover:bg-slate-100 transition">INDIVIDUAL</button>
+                        <button onclick="selectMembresia('temporal-juvenil')" id="menu-temporal-juvenil" class="sub-item w-full text-left bg-white font-bold text-slate-800 py-2.5 px-3 rounded text-sm hover:bg-slate-100 transition">JUVENIL</button>
+                        <button onclick="selectMembresia('temporal-universitario')" id="menu-temporal-universitario" class="sub-item w-full text-left bg-white font-bold text-slate-800 py-2.5 px-3 rounded text-sm hover:bg-slate-100 transition">UNIVERSITARIO</button>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- PANEL CENTRAL DE INFORMACIÓN (Dinámico) -->
+        <main class="md:col-span-3 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden min-h-[420px] flex flex-col justify-between">
+            
+            <!-- Contenido que cambiará según la selección -->
+            <div id="content-display" class="p-6 md:p-8">
+                <!-- Se inyecta dinámicamente con JavaScript -->
+            </div>
+
+            <!-- Franja Inferior de Costos -->
+            <div id="cost-display" class="grid grid-cols-2 text-white font-bold">
+                <!-- Se inyecta dinámicamente con JavaScript -->
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="text-center py-4 text-xs text-slate-500">
+        Club Atlas © 2026 - Todos los derechos reservados
+    </footer>
+
+    <!-- Script de Interactividad -->
+    <script>
+        // Base de datos de información por Sede y Membresía
+        const data = {
+            chapalita: {
+                vitalicia: {
+                    titulo: "Membresía Vitalicia - Chapalita",
+                    beneficios: [
+                        "Incluye el matrimonio y todos los hijos menores de 25 años.",
+                        "Es para uso de todas las instalaciones del club.",
+                        "Pueden adicionar familiares directos pagando un extra.",
+                        "Hay clases incluidas dentro del mantenimiento."
+                    ],
+                    inversion: "$500,000",
+                    mantenimiento: "$11,690"
+                },
+                traspaso: {
+                    titulo: "Membresía Traspaso - Chapalita",
+                    beneficios: [
+                        "Derecho de reventa o cesión de derechos de membresía titular.",
+                        "Acceso completo a instalaciones familiares.",
+                        "Trámite sujeto a aprobación de directiva."
+                    ],
+                    inversion: "$350,000",
+                    mantenimiento: "$11,690"
+                },
+                "temporal-familiar": {
+                    titulo: "Membresía Temporal Familiar - Chapalita",
+                    beneficios: [
+                        "Vigencia anual para núcleo familiar directo.",
+                        "Acceso a canchas de tenis, albercas y áreas sociales.",
+                        "Descuentos especiales en restaurantes."
+                    ],
+                    inversion: "$65,000",
+                    mantenimiento: "$5,500"
+                },
+                "temporal-pareja": {
+                    titulo: "Membresía Temporal Pareja - Chapalita",
+                    beneficios: [
+                        "Diseñada para cónyuges o parejas sin hijos registrados.",
+                        "Acceso total a zonas deportivas y húmedas."
+                    ],
+                    inversion: "$48,000",
+                    mantenimiento: "$4,200"
+                },
+                "temporal-individual": {
+                    titulo: "Membresía Temporal Individual - Chapalita",
+                    beneficios: [
+                        "Acceso personal e individual a todas las áreas deportivas.",
+                        "Uso libre de gimnasio y casilleros."
+                    ],
+                    inversion: "$35,000",
+                    mantenimiento: "$3,100"
+                },
+                "temporal-juvenil": {
+                    titulo: "Membresía Temporal Juvenil - Chapalita",
+                    beneficios: [
+                        "Especial para jóvenes de 18 a 25 años.",
+                        "Acceso a áreas recreativas y escuelas deportivas."
+                    ],
+                    inversion: "$22,000",
+                    mantenimiento: "$2,100"
+                },
+                "temporal-universitario": {
+                    titulo: "Membresía Temporal Universitario - Chapalita",
+                    beneficios: [
+                        "Requisito presentar credencial vigente de universidad.",
+                        "Tarifas preferenciales en horarios específicos."
+                    ],
+                    inversion: "$18,000",
+                    mantenimiento: "$1,800"
+                }
+            },
+            colomos: {
+                vitalicia: {
+                    titulo: "Membresía Vitalicia - Colomos",
+                    beneficios: [
+                        "Cobertura familiar total en una de las sedes con mayor tradición boscosa.",
+                        "Derecho preferencial a instalaciones acuáticas y ecuestres (si aplica).",
+                        "Acceso a eventos exclusivos de socios fundadores."
+                    ],
+                    inversion: "$550,000",
+                    mantenimiento: "$12,400"
+                },
+                traspaso: {
+                    titulo: "Membresía Traspaso - Colomos",
+                    beneficios: [
+                        "Cesión inmediata de derechos patrimoniales en Colomos.",
+                        "Uso completo de las amenidades del club."
+                    ],
+                    inversion: "$380,000",
+                    mantenimiento: "$12,400"
+                },
+                "temporal-familiar": {
+                    titulo: "Membresía Temporal Familiar - Colomos",
+                    beneficios: [
+                        "Acceso anual completo para padres e hijos.",
+                        "Escuelas formativas de natación y tenis incluidas."
+                    ],
+                    inversion: "$70,000",
+                    mantenimiento: "$5,800"
+                },
+                "temporal-pareja": {
+                    titulo: "Membresía Temporal Pareja - Colomos",
+                    beneficios: [
+                        "Ideal para parejas que buscan bienestar y deporte.",
+                        "Acceso a zonas de relajación y áreas verdes."
+                    ],
+                    inversion: "$52,000",
+                    mantenimiento: "$4,500"
+                },
+                "temporal-individual": {
+                    titulo: "Membresía Temporal Individual - Colomos",
+                    beneficios: [
+                        "Acceso personal al gimnasio y pista de acondicionamiento.",
+                        "Casillero asignado."
+                    ],
+                    inversion: "$38,000",
+                    mantenimiento: "$3,300"
+                },
+                "temporal-juvenil": {
+                    titulo: "Membresía Temporal Juvenil - Colomos",
+                    beneficios: [
+                        "Para jóvenes de 18 a 25 años con cuotas preferenciales."
+                    ],
+                    inversion: "$24,000",
+                    mantenimiento: "$2,300"
+                },
+                "temporal-universitario": {
+                    titulo: "Membresía Temporal Universitario - Colomos",
+                    beneficios: [
+                        "Apoyo a estudiantes universitarios con credencial vigente."
+                    ],
+                    inversion: "$19,500",
+                    mantenimiento: "$1,900"
+                }
+            },
+            country: {
+                vitalicia: {
+                    titulo: "Membresía Vitalicia - Country",
+                    beneficios: [
+                        "Acceso ilimitado al prestigioso campo de golf de 18 hoyos.",
+                        "Casa club de lujo, restaurantes exclusivos y zonas VIP.",
+                        "Derechos familiares plenos."
+                    ],
+                    inversion: "$950,000",
+                    mantenimiento: "$16,500"
+                },
+                traspaso: {
+                    titulo: "Membresía Traspaso - Country",
+                    beneficios: [
+                        "Traspaso autorizado de derechos de golf y sociales.",
+                        "Acceso preferente a torneos internos."
+                    ],
+                    inversion: "$750,000",
+                    mantenimiento: "$16,500"
+                },
+                "temporal-familiar": {
+                    titulo: "Membresía Temporal Familiar - Country",
+                    beneficios: [
+                        "Acceso familiar a instalaciones sociales y albercas (Golf restringido o con cuota por green fee).",
+                        "Áreas recreativas infantiles."
+                    ],
+                    inversion: "$120,000",
+                    mantenimiento: "$7,800"
+                },
+                "temporal-pareja": {
+                    titulo: "Membresía Temporal Pareja - Country",
+                    beneficios: [
+                        "Acceso para parejas a restaurantes y áreas sociales."
+                    ],
+                    inversion: "$90,000",
+                    mantenimiento: "$6,200"
+                },
+                "temporal-individual": {
+                    titulo: "Membresía Temporal Individual - Country",
+                    beneficios: [
+                        "Acceso individual a gimnasio, tenis y restaurantes."
+                    ],
+                    inversion: "$65,000",
+                    mantenimiento: "$4,800"
+                },
+                "temporal-juvenil": {
+                    titulo: "Membresía Temporal Juvenil - Country",
+                    beneficios: [
+                        "Acceso a instalaciones deportivas juveniles."
+                    ],
+                    inversion: "$35,000",
+                    mantenimiento: "$3,200"
+                },
+                "temporal-universitario": {
+                    titulo: "Membresía Temporal Universitario - Country",
+                    beneficios: [
+                        "Tarifa especial para estudiantes universitarios autorizados."
+                    ],
+                    inversion: "$28,000",
+                    mantenimiento: "$2,500"
+                }
+            }
+        };
+
+        let currentSede = 'chapalita';
+        let currentMembresia = 'vitalicia';
+
+        function switchSede(sede) {
+            currentSede = sede;
+            // Actualizar botones de sede
+            document.querySelectorAll('.sede-btn').forEach(btn => {
+                btn.classList.remove('bg-red-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-300');
+            });
+            const activeBtn = document.getElementById('btn-' + sede);
+            activeBtn.classList.remove('bg-white', 'text-slate-700', 'border', 'border-slate-300');
+            activeBtn.classList.add('bg-red-600', 'text-white');
+
+            renderContent();
+        }
+
+        function selectMembresia(membresiaKey) {
+            currentMembresia = membresiaKey;
+
+            // Limpiar bordes activos del menú lateral
+            document.querySelectorAll('.menu-item, .sub-item').forEach(el => {
+                el.classList.remove('border-red-600', 'bg-red-50', 'text-red-700');
+                el.classList.add('border-transparent');
+            });
+
+            // Marcar activo
+            const activeEl = document.getElementById('menu-' + membresiaKey);
+            if (activeEl) {
+                activeEl.classList.add('border-red-600', 'bg-red-50', 'text-red-700');
+                activeEl.classList.remove('border-transparent');
+            }
+
+            renderContent();
+        }
+
+        function toggleTemporalSubmenu() {
+            const submenu = document.getElementById('temporal-submenu');
+            const arrow = document.getElementById('temporal-arrow');
+            submenu.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function renderContent() {
+            const info = data[currentSede][currentMembresia];
+            
+            // Renderizar beneficios (iconos rojos idénticos al estilo de tu imagen)
+            let beneficiosHTML = '';
+            info.beneficios.forEach(b => {
+                beneficiosHTML += `
+                    <div class="flex items-start space-x-4 border-b border-slate-100 pb-4 last:border-0">
+                        <span class="text-red-600 font-bold text-xl mt-0.5">•</span>
+                        <p class="text-slate-700 font-medium text-base md:text-lg">${b}</p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('content-display').innerHTML = `
+                <h3 class="text-xl font-black text-slate-800 mb-6 uppercase border-b-2 border-red-600 pb-2">${info.titulo}</h3>
+                <div class="space-y-4">
+                    ${beneficiosHTML}
+                </div>
+            `;
+
+            // Renderizar barra inferior de costos
+            document.getElementById('cost-display').innerHTML = `
+                <div class="bg-red-600 p-5 text-center flex flex-col justify-center">
+                    <span class="text-xs uppercase tracking-wider text-red-100 font-semibold">Inversión</span>
+                    <span class="text-2xl md:text-3xl font-black mt-1">${info.inversion}</span>
+                </div>
+                <div class="bg-slate-900 p-5 text-center flex flex-col justify-center border-l border-slate-800">
+                    <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Mantenimiento</span>
+                    <span class="text-2xl md:text-3xl font-black mt-1">${info.mantenimiento}</span>
+                </div>
+            `;
+        }
+
+        // Cargar por defecto al iniciar
+        selectMembresia('vitalicia');
+    </script>
+</body>
+</html>
