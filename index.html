@@ -155,7 +155,7 @@
                 temporales: [
                     { id: 't-familiar', titulo: "TEMPORAL FAMILIAR", inversion: 34000, mantenimiento: 11690, beneficios: ["Vigencia anual para núcleo familiar directo."] },
                     { id: 't-individual', titulo: "TEMPORAL INDIVIDUAL", inversion: 22100, mantenimiento: 6569, beneficios: ["Acceso personal e individual a todas las áreas deportivas."] },
-                    { id: 't-papa', titulo: "TEMPORAL PAPÁ O MAMÁ SOLTERO", inversion: 22100, mantenimiento: 6569, beneficios: ["Diseñado para familias monoparentales.", "Hijo(a) de 3 a 16 años paga $1,968 extras."] },
+                    { id: 't-papa', titulo: "TEMPORAL PAPÁ O MAMÁ SOLTERO", inversion: 22100, mantenimiento: 6569, beneficios: ["Diseñado para familias monoparentales."] },
                     { id: 't-pareja', titulo: "TEMPORAL PAREJA", inversion: 27305, mantenimiento: 10480, beneficios: ["Diseñada para cónyuges sin hijos registrados."] },
                     { id: 't-juvenil', titulo: "TEMPORAL JUVENIL", inversion: 9990, mantenimiento: 4593, beneficios: ["Especial para jóvenes con acceso a áreas recreativas."] },
                     { id: 't-univ', titulo: "TEMPORAL UNIVERSITARIO", inversion: 2616, mantenimiento: 4593, beneficios: ["Requisito presentar credencial vigente de universidad."] },
@@ -206,7 +206,7 @@
                 }
             },
             colomos: {
-                vitalicia: { titulo: "VITALICIA - COLOMOS", inversion: 1100000, mantenimiento: 13690, beneficios: ["Cobertura familiar total en la sede.", "Mantenimiento Corporativo Familiar: $10,268"] },
+                vitalicia: { titulo: "VITALICIA - COLOMOS", inversion: 1100000, mantenimiento: 13690, beneficios: ["Cobertura familiar total en la sede."] },
                 traspaso: { titulo: "TRASPASO - COLOMOS", inversion: 550000, mantenimiento: 13690, beneficios: ["Cesión inmediata de derechos patrimoniales."] },
                 temporales: [
                     { id: 't-familiar', titulo: "TEMPORAL FAMILIAR", inversion: 90000, mantenimiento: 13690, beneficios: ["Acceso anual completo para padres e hijos."] }
@@ -363,13 +363,12 @@
         function buildSimuladorSelect() {
             var select = document.getElementById('select-adic-tipo');
             if (!select) return;
-            select.innerHTML = '<option value="0" data-nombre="Ninguno">Seleccionar Adicionado...</option>';
+            select.innerHTML = '<option value="0" data-tipo="base" data-nombre="Ninguno">Seleccionar Adicionado...</option>';
 
-            // ============================================
-            // 1. BLOQUE CUOTA CORPORATIVA ESTRUCTURADO
-            // ============================================
+            // =========================================================
+            // 1. BLOQUE CUOTA CORPORATIVA ESTRUCTURADO (Precios Fijos)
+            // =========================================================
             
-            // Título Principal (Negritas)
             var optCorpTitle = document.createElement('option');
             optCorpTitle.disabled = true;
             optCorpTitle.style.fontWeight = "bold";
@@ -385,9 +384,10 @@
             select.appendChild(optColTitle);
             
             var optColFam = document.createElement('option');
-            optColFam.value = "0.75";
+            optColFam.value = "10268"; 
+            optColFam.setAttribute('data-tipo', 'fijo');
             optColFam.setAttribute('data-nombre', 'Corp. Familiar (Colomos)');
-            optColFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75%";
+            optColFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75% ($10,268)";
             select.appendChild(optColFam);
 
             // - Chapalita
@@ -398,15 +398,17 @@
             select.appendChild(optChapTitle);
 
             var optChapFam = document.createElement('option');
-            optChapFam.value = "0.75";
+            optChapFam.value = "8768";
+            optChapFam.setAttribute('data-tipo', 'fijo');
             optChapFam.setAttribute('data-nombre', 'Corp. Familiar (Chapalita)');
-            optChapFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75%";
+            optChapFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75% ($8,768)";
             select.appendChild(optChapFam);
 
             var optChapInd = document.createElement('option');
-            optChapInd.value = "1.00";
+            optChapInd.value = "6569";
+            optChapInd.setAttribute('data-tipo', 'fijo');
             optChapInd.setAttribute('data-nombre', 'Corp. Individual (Chapalita)');
-            optChapInd.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Individual 100%";
+            optChapInd.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Individual 100% ($6,569)";
             select.appendChild(optChapInd);
 
             // - Country
@@ -417,20 +419,22 @@
             select.appendChild(optCounTitle);
 
             var optCounFam = document.createElement('option');
-            optCounFam.value = "0.75";
+            optCounFam.value = "8985";
+            optCounFam.setAttribute('data-tipo', 'fijo');
             optCounFam.setAttribute('data-nombre', 'Corp. Familiar (Country)');
-            optCounFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75%";
+            optCounFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75% ($8,985)";
             select.appendChild(optCounFam);
 
             var optCounInd = document.createElement('option');
-            optCounInd.value = "0.75";
+            optCounInd.value = "7255";
+            optCounInd.setAttribute('data-tipo', 'fijo');
             optCounInd.setAttribute('data-nombre', 'Corp. Individual (Country)');
-            optCounInd.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Individual 75%";
+            optCounInd.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Individual 75% ($7,255)";
             select.appendChild(optCounInd);
 
-            // ============================================
-            // 2. BLOQUE DE ADICIONADOS DINÁMICOS POR SEDE
-            // ============================================
+            // =========================================================
+            // 2. BLOQUE DE ADICIONADOS DINÁMICOS POR SEDE (Porcentajes)
+            // =========================================================
             var adicData = data[currentSede].adicionados;
             var grupos = [
                 { label: "Hijos Adicionados", key: "juniors" },
@@ -445,12 +449,30 @@
                 adicData[g.key].items.forEach(function(it) {
                     var opt = document.createElement('option');
                     opt.value = it.factor;
+                    opt.setAttribute('data-tipo', 'porcentaje');
                     opt.setAttribute('data-nombre', it.concepto);
                     opt.textContent = it.concepto + ' (' + it.pct + ')';
                     optGroup.appendChild(opt);
                 });
                 select.appendChild(optGroup);
             });
+
+            // =========================================================
+            // 3. BLOQUE PAPÁ O MAMÁ SOLTERO(A) (Precio Fijo Adicional)
+            // =========================================================
+            var optMonoparentalTitle = document.createElement('option');
+            optMonoparentalTitle.disabled = true;
+            optMonoparentalTitle.style.fontWeight = "bold";
+            optMonoparentalTitle.style.color = "black";
+            optMonoparentalTitle.innerHTML = "Papá o Mamá Soltero(a)";
+            select.appendChild(optMonoparentalTitle);
+
+            var optHijoMono = document.createElement('option');
+            optHijoMono.value = "1968";
+            optHijoMono.setAttribute('data-tipo', 'fijo');
+            optHijoMono.setAttribute('data-nombre', 'Hijo(a) 3 a 16 años (Papá/Mamá Soltero)');
+            optHijoMono.innerHTML = "&nbsp;&nbsp;Hijo(a) de 3 a 16 años ($1,968)";
+            select.appendChild(optHijoMono);
 
             select.value = "0";
             
@@ -464,10 +486,12 @@
             var inputCant = document.getElementById('input-adic-cant');
             if (!select || !inputCant) return;
 
-            var factor = parseFloat(select.value);
-            if (factor === 0 || isNaN(factor)) return;
+            var option = select.options[select.selectedIndex];
+            var valor = parseFloat(option.value);
+            if (valor === 0 || isNaN(valor)) return;
 
-            var nombre = select.options[select.selectedIndex].getAttribute('data-nombre');
+            var tipo = option.getAttribute('data-tipo');
+            var nombre = option.getAttribute('data-nombre');
             var cant = parseInt(inputCant.value);
             if (cant < 1 || isNaN(cant)) cant = 1;
 
@@ -476,7 +500,7 @@
             if (existe) {
                 existe.cant += cant;
             } else {
-                simuladorItems.push({ nombre: nombre, factor: factor, cant: cant });
+                simuladorItems.push({ nombre: nombre, valor: valor, tipo: tipo, cant: cant });
             }
 
             // Resetea el selector a 1 por comodidad
@@ -647,7 +671,11 @@
                 // Cálculo total iterando sobre todos los items del carrito simulador
                 var costoExtraTotal = 0;
                 simuladorItems.forEach(function(it) {
-                    costoExtraTotal += (mantBase * it.factor * it.cant);
+                    if (it.tipo === 'fijo') {
+                        costoExtraTotal += (it.valor * it.cant); // Suma el precio fijo exacto
+                    } else {
+                        costoExtraTotal += (mantBase * it.valor * it.cant); // Multiplica el porcentaje
+                    }
                 });
                 
                 if (costoExtraTotal > 0) {
