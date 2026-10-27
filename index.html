@@ -47,18 +47,18 @@
                             <span>TEMPORAL</span>
                             <span id="temporal-arrow" class="transform transition-transform text-xs">▼</span>
                         </button>
-                        <div id="temporal-submenu" class="pl-3 mt-1 space-y-1 hidden">
-                            <!-- Se llena dinámicamente según la sede -->
+                        <div id="temporal-submenu" class="pl-2 mt-1 space-y-1 hidden">
+                            <!-- Se llena dinámicamente -->
                         </div>
                     </div>
 
-                    <!-- Menú Desplegable ADICIONADOS -->
+                    <!-- Menú Desplegable ADICIONADOS (Abierto por defecto) -->
                     <div>
                         <button onclick="toggleAdicionadosSubmenu()" class="w-full text-left bg-white font-black text-slate-900 py-3 px-4 rounded shadow-sm hover:bg-slate-50 transition flex justify-between items-center border-l-4 border-transparent">
                             <span>ADICIONADOS</span>
-                            <span id="adicionados-arrow" class="transform transition-transform text-xs">▼</span>
+                            <span id="adicionados-arrow" class="transform transition-transform text-xs">▲</span>
                         </button>
-                        <div id="adicionados-submenu" class="pl-2 mt-1 space-y-1 hidden">
+                        <div id="adicionados-submenu" class="pl-2 mt-1 space-y-1">
                             <button onclick="selectAdicionadoDirecto('juniors')" id="menu-adic-juniors" class="sub-item-adic w-full text-left bg-white font-black text-xs text-slate-800 py-2.5 px-3 rounded shadow-sm hover:bg-slate-50 transition border-l-4 border-transparent uppercase">
                                 JUNIORS
                             </button>
@@ -81,21 +81,61 @@
                 <label for="select-adicionado" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Simular Adicionado en Membresía:</label>
                 <select id="select-adicionado" onchange="renderContent()" class="w-full bg-white border border-slate-300 text-slate-700 text-xs rounded focus:ring-red-500 focus:border-red-500 block p-2">
                     <option value="0">Ninguno (Cuota Base)</option>
+                    <optgroup label="Hijos Adicionados">
+                        <option value="0.15">Junior de 25 a 29 años (15%)</option>
+                        <option value="0.25">Junior de 30 a 34 años (25%)</option>
+                        <option value="0.30">Junior de 35 años o más (30%)</option>
+                        <option value="0.60">Junior casado hasta 40 años (60%)</option>
+                    </optgroup>
+                    <optgroup label="Hijos Seniors Adicionados">
+                        <option value="0.30">Junior Senior de 25 a 29 años (30%)</option>
+                        <option value="0.50">Junior Senior de 30 a 34 años (50%)</option>
+                        <option value="0.60">Junior Senior de 35 años o más (60%)</option>
+                        <option value="1.00">Junior Senior casado hasta 40 años (100%)</option>
+                    </optgroup>
+                    <optgroup label="Familia Adicionada">
+                        <option value="0.20">Papá (20%)</option>
+                        <option value="0.15">Nieto hasta los 14 años (15%)</option>
+                        <option value="0.30">Nieto de 15 a 24 años (30%)</option>
+                        <option value="0.30">Nieto Senior hasta 14 años (30%)</option>
+                        <option value="0.30">Hermano/Sobrino soltero 3 a 29 años (30%)</option>
+                        <option value="0.40">Hermano/Sobrino soltero 30 a 34 años (40%)</option>
+                        <option value="0.45">Hermano/Sobrino soltero más de 35 años (45%)</option>
+                        <option value="0.90">Hermano/Sobrino casado hasta 39 años (90%)</option>
+                        <option value="1.00">Hermano/Sobrino casado más de 40 años (100%)</option>
+                    </optgroup>
                 </select>
                 <p class="text-[10px] text-slate-500 mt-2 leading-tight">Calcula el incremento porcentual sobre la cuota de mantenimiento activa.</p>
             </div>
         </aside>
 
-        <!-- PANEL CENTRAL DE INFORMACIÓN -->
+        <!-- PANEL CENTRAL DE INFORMACIÓN (Pre-renderizado por defecto) -->
         <main class="md:col-span-3 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden min-h-[460px] flex flex-col justify-between">
             
             <div id="content-display" class="p-6 md:p-8">
-                <!-- Se inyecta dinámicamente con JavaScript -->
+                <h3 class="text-xl font-black text-slate-800 mb-6 uppercase border-b-2 border-red-600 pb-2">VITALICIA - CHAPALITA</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-4 border-b border-slate-100 pb-4 last:border-0">
+                        <span class="text-red-600 font-bold text-xl mt-0.5">•</span>
+                        <p class="text-slate-700 font-medium text-base md:text-lg">Incluye el matrimonio y todos los hijos menores de 25 años.</p>
+                    </div>
+                    <div class="flex items-start space-x-4 border-b border-slate-100 pb-4 last:border-0">
+                        <span class="text-red-600 font-bold text-xl mt-0.5">•</span>
+                        <p class="text-slate-700 font-medium text-base md:text-lg">Pueden adicionar familiares directos pagando un extra.</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Franja Inferior de Costos -->
             <div id="cost-display" class="grid grid-cols-2 text-white font-bold">
-                <!-- Se inyecta dinámicamente con JavaScript -->
+                <div class="bg-red-600 p-5 text-center flex flex-col justify-center">
+                    <span class="text-xs uppercase tracking-wider text-red-100 font-semibold">Inversión</span>
+                    <span class="text-2xl md:text-3xl font-black mt-1">$500,000</span>
+                </div>
+                <div class="bg-slate-900 p-5 text-center flex flex-col justify-center border-l border-slate-800 relative">
+                    <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Mantenimiento Mensual</span>
+                    <span class="text-2xl md:text-3xl font-black mt-1">$11,690</span>
+                </div>
             </div>
         </main>
 
@@ -117,7 +157,7 @@
 
         var data = {
             chapalita: {
-                vitalicia: { titulo: "VITALICIA - CHAPALITA", inversion: 500000, mantenimiento: 11690, beneficios: ["Incluye el matrimonio y todos los hijos menores de 25 años.", "Pueden adicionar familiares directos pagando un extra.", "Mantenimiento Corporativo Familiar: $8,768"] },
+                vitalicia: { titulo: "VITALICIA - CHAPALITA", inversion: 500000, mantenimiento: 11690, beneficios: ["Incluye el matrimonio y todos los hijos menores de 25 años.", "Pueden adicionar familiares directos pagando un extra."] },
                 traspaso: { titulo: "TRASPASO - CHAPALITA", inversion: 300000, mantenimiento: 11690, beneficios: ["Derecho de cesión de derechos de membresía titular.", "Acceso completo a instalaciones familiares."] },
                 temporales: [
                     { id: 't-familiar', titulo: "TEMPORAL FAMILIAR", inversion: 34000, mantenimiento: 11690, beneficios: ["Vigencia anual para núcleo familiar directo."] },
@@ -515,18 +555,10 @@
                 '</div>';
         }
 
-        // Inicialización segura del sistema
-        function initApp() {
-            buildTemporalMenu();
-            buildSimuladorSelect();
-            selectMembresia('vitalicia');
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            initApp();
-        }
+        // Ejecutar inmediatamente
+        buildTemporalMenu();
+        buildSimuladorSelect();
+        selectMembresia('vitalicia');
     </script>
 </body>
 </html>
