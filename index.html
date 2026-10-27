@@ -52,7 +52,7 @@
                         </div>
                     </div>
 
-                    <!-- Menú Desplegable ADICIONADOS (Abierto por defecto) -->
+                    <!-- Menú Desplegable ADICIONADOS -->
                     <div>
                         <button onclick="toggleAdicionadosSubmenu()" class="w-full text-left bg-white font-black text-slate-900 py-3 px-4 rounded shadow-sm hover:bg-slate-50 transition flex justify-between items-center border-l-4 border-transparent">
                             <span>ADICIONADOS</span>
@@ -76,40 +76,30 @@
                 </nav>
             </div>
 
-            <!-- Bloque Simulador Dinámico según la Sede -->
+            <!-- Bloque Simulador Dinámico según la Sede (Con listado múltiple) -->
             <div id="simulador-container" class="bg-slate-200 p-3 rounded border border-slate-400 mt-2">
-                <label for="select-adicionado" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Simular Adicionado en Membresía:</label>
-                <select id="select-adicionado" onchange="renderContent()" class="w-full bg-white border border-slate-300 text-slate-700 text-xs rounded focus:ring-red-500 focus:border-red-500 block p-2">
-                    <option value="0">Ninguno (Cuota Base)</option>
-                    <optgroup label="Hijos Adicionados">
-                        <option value="0.15">Junior de 25 a 29 años (15%)</option>
-                        <option value="0.25">Junior de 30 a 34 años (25%)</option>
-                        <option value="0.30">Junior de 35 años o más (30%)</option>
-                        <option value="0.60">Junior casado hasta 40 años (60%)</option>
-                    </optgroup>
-                    <optgroup label="Hijos Seniors Adicionados">
-                        <option value="0.30">Junior Senior de 25 a 29 años (30%)</option>
-                        <option value="0.50">Junior Senior de 30 a 34 años (50%)</option>
-                        <option value="0.60">Junior Senior de 35 años o más (60%)</option>
-                        <option value="1.00">Junior Senior casado hasta 40 años (100%)</option>
-                    </optgroup>
-                    <optgroup label="Familia Adicionada">
-                        <option value="0.20">Papá (20%)</option>
-                        <option value="0.15">Nieto hasta los 14 años (15%)</option>
-                        <option value="0.30">Nieto de 15 a 24 años (30%)</option>
-                        <option value="0.30">Nieto Senior hasta 14 años (30%)</option>
-                        <option value="0.30">Hermano/Sobrino soltero 3 a 29 años (30%)</option>
-                        <option value="0.40">Hermano/Sobrino soltero 30 a 34 años (40%)</option>
-                        <option value="0.45">Hermano/Sobrino soltero más de 35 años (45%)</option>
-                        <option value="0.90">Hermano/Sobrino casado hasta 39 años (90%)</option>
-                        <option value="1.00">Hermano/Sobrino casado más de 40 años (100%)</option>
-                    </optgroup>
-                </select>
-                <p class="text-[10px] text-slate-500 mt-2 leading-tight">Calcula el incremento porcentual sobre la cuota de mantenimiento activa.</p>
+                <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wide mb-2">Simulador de Adicionados:</label>
+                
+                <div class="flex flex-col gap-2">
+                    <select id="select-adic-tipo" class="w-full bg-white border border-slate-300 text-slate-700 text-[11px] rounded focus:ring-red-500 focus:border-red-500 block p-2">
+                        <option value="0" data-nombre="Ninguno">Seleccionar Adicionado...</option>
+                    </select>
+                    <div class="flex gap-2">
+                        <input type="number" id="input-adic-cant" value="1" min="1" class="w-1/3 bg-white border border-slate-300 text-slate-700 text-xs rounded focus:ring-red-500 focus:border-red-500 block p-2 text-center" placeholder="Cant.">
+                        <button onclick="agregarAdicionadoSimulador()" class="w-2/3 bg-slate-600 text-white font-bold text-[11px] rounded hover:bg-slate-700 transition shadow-sm">Añadir a cuota</button>
+                    </div>
+                </div>
+                
+                <!-- Lista dinámica de perfiles agregados -->
+                <div id="lista-adicionados" class="space-y-1 mt-3">
+                    <!-- Se inyecta dinámicamente -->
+                </div>
+                
+                <p class="text-[10px] text-slate-500 mt-2 leading-tight">Suma múltiples perfiles (ej. 2 juniors + 1 papá) para ver el impacto en la cuota activa.</p>
             </div>
         </aside>
 
-        <!-- PANEL CENTRAL DE INFORMACIÓN (Pre-renderizado por defecto) -->
+        <!-- PANEL CENTRAL DE INFORMACIÓN -->
         <main class="md:col-span-3 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden min-h-[460px] flex flex-col justify-between">
             
             <div id="content-display" class="p-6 md:p-8">
@@ -154,6 +144,9 @@
             minimumFractionDigits: 0,
             maximumFractionDigits: 2
         });
+
+        // Arreglo para guardar el "carrito" de adicionados seleccionados
+        var simuladorItems = [];
 
         var data = {
             chapalita: {
@@ -368,9 +361,9 @@
         }
 
         function buildSimuladorSelect() {
-            var select = document.getElementById('select-adicionado');
+            var select = document.getElementById('select-adic-tipo');
             if (!select) return;
-            select.innerHTML = '<option value="0">Ninguno (Cuota Base)</option>';
+            select.innerHTML = '<option value="0" data-nombre="Ninguno">Seleccionar Adicionado...</option>';
 
             var adicData = data[currentSede].adicionados;
             var grupos = [
@@ -386,6 +379,7 @@
                 adicData[g.key].items.forEach(function(it) {
                     var opt = document.createElement('option');
                     opt.value = it.factor;
+                    opt.setAttribute('data-nombre', it.concepto);
                     opt.textContent = it.concepto + ' (' + it.pct + ')';
                     optGroup.appendChild(opt);
                 });
@@ -393,6 +387,70 @@
             });
 
             select.value = "0";
+            
+            // Limpiar la lista cada vez que se cambia de sede porque los precios cambian
+            simuladorItems = [];
+            actualizarListaAdicionados();
+        }
+
+        function agregarAdicionadoSimulador() {
+            var select = document.getElementById('select-adic-tipo');
+            var inputCant = document.getElementById('input-adic-cant');
+            if (!select || !inputCant) return;
+
+            var factor = parseFloat(select.value);
+            if (factor === 0 || isNaN(factor)) return;
+
+            var nombre = select.options[select.selectedIndex].getAttribute('data-nombre');
+            var cant = parseInt(inputCant.value);
+            if (cant < 1 || isNaN(cant)) cant = 1;
+
+            // Si ya existe en la lista, le sumamos la cantidad
+            var existe = simuladorItems.find(function(item) { return item.nombre === nombre; });
+            if (existe) {
+                existe.cant += cant;
+            } else {
+                simuladorItems.push({ nombre: nombre, factor: factor, cant: cant });
+            }
+
+            // Resetea el selector a 1 por comodidad
+            select.value = "0";
+            inputCant.value = "1";
+
+            // Forzar a vista de membresía normal para que se pueda ver la suma (si estaba viendo la tabla de adicionados)
+            if (currentType === 'adicionado') {
+                selectMembresia('vitalicia');
+            } else {
+                actualizarListaAdicionados();
+                renderContent();
+            }
+        }
+
+        function removerAdicionadoSimulador(index) {
+            simuladorItems.splice(index, 1);
+            actualizarListaAdicionados();
+            renderContent();
+        }
+
+        function actualizarListaAdicionados() {
+            var container = document.getElementById('lista-adicionados');
+            if (!container) return;
+            
+            if (simuladorItems.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            var html = '';
+            simuladorItems.forEach(function(item, idx) {
+                html += '<div class="flex justify-between items-center bg-white border border-slate-300 rounded px-2 py-1 shadow-sm">' +
+                            '<span class="text-[11px] text-slate-700 font-medium truncate pr-2" title="' + item.nombre + '">' + 
+                                '<b class="text-red-600">' + item.cant + 'x</b> ' + item.nombre + 
+                            '</span>' +
+                            '<button onclick="removerAdicionadoSimulador(' + idx + ')" class="text-slate-400 hover:text-red-600 font-bold px-1 text-sm">&times;</button>' +
+                        '</div>';
+            });
+            container.innerHTML = html;
         }
 
         function selectMembresia(membresiaKey) {
@@ -517,29 +575,31 @@
             var mantenimientoStr = "";
             var extraAdicionadoHTML = "";
             
-            var selectAdic = document.getElementById('select-adicionado');
-            var factorAdicionado = selectAdic ? (parseFloat(selectAdic.value) || 0) : 0;
-
             if (typeof info.mantenimiento === 'number') {
                 var mantBase = info.mantenimiento;
                 
-                if (factorAdicionado > 0) {
-                    var costoExtra = mantBase * factorAdicionado;
-                    var mantTotal = mantBase + costoExtra;
+                // Cálculo total iterando sobre todos los items del carrito simulador
+                var costoExtraTotal = 0;
+                simuladorItems.forEach(function(it) {
+                    costoExtraTotal += (mantBase * it.factor * it.cant);
+                });
+                
+                if (costoExtraTotal > 0) {
+                    var mantTotal = mantBase + costoExtraTotal;
                     
                     mantenimientoStr = 
                         '<div class="flex flex-col items-center">' +
                             '<span class="text-xl md:text-2xl font-black mt-1 line-through text-slate-500">' + formatter.format(mantBase) + '</span>' +
                             '<span class="text-2xl md:text-3xl font-black text-white">' + formatter.format(mantTotal) + '</span>' +
                         '</div>';
-                    extraAdicionadoHTML = '<span class="text-[11px] block text-green-400 mt-1">Incluye +' + formatter.format(costoExtra) + ' de Adicionado</span>';
+                    extraAdicionadoHTML = '<span class="text-[11px] block text-green-400 mt-1 leading-tight">Incluye +' + formatter.format(costoExtraTotal) + ' de Adicionados</span>';
                 } else {
                     mantenimientoStr = '<span class="text-2xl md:text-3xl font-black mt-1">' + formatter.format(mantBase) + '</span>';
                 }
             } else {
                 mantenimientoStr = '<span class="text-xl font-black mt-1">' + info.mantenimiento + '</span>';
-                if (factorAdicionado > 0) {
-                     extraAdicionadoHTML = '<span class="text-[11px] block text-yellow-400 mt-1">Cálculo manual requerido por tipo de paquete</span>';
+                if (simuladorItems.length > 0) {
+                     extraAdicionadoHTML = '<span class="text-[11px] block text-yellow-400 mt-1 leading-tight">Cálculo manual requerido por tipo de paquete</span>';
                 }
             }
 
@@ -555,7 +615,7 @@
                 '</div>';
         }
 
-        // Ejecutar inmediatamente
+        // Ejecutar inmediatamente al abrir la web
         buildTemporalMenu();
         buildSimuladorSelect();
         selectMembresia('vitalicia');
