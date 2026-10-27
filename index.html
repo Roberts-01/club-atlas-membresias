@@ -315,4 +315,212 @@
                 const btn = document.createElement('button');
                 btn.onclick = () => selectTemporal(temp.id);
                 btn.id = 'menu-' + temp.id;
-                btn.className = 'sub-item w-full text-left bg-white font-bold text-slate-800 py-2 px-3 rounded text-xs hover:bg-slate-1
+                btn.className = 'sub-item w-full text-left bg-white font-bold text-slate-800 py-2 px-3 rounded text-xs hover:bg-slate-100 transition';
+                
+                let nombreMenu = temp.titulo.replace('TEMPORAL ', '');
+                btn.innerText = nombreMenu;
+                
+                submenu.appendChild(btn);
+            });
+        }
+
+        // Construye el select dinámico con los porcentajes exactos de la sede actual
+        function buildSimuladorSelect() {
+            const select = document.getElementById('select-adicionado');
+            const valorPrevio = select.value;
+            select.innerHTML = '<option value="0">Ninguno (Cuota Base)</option>';
+
+            const adicData = data[currentSede].adicionados;
+            const grupos = [
+                { label: "Hijos Adicionados", key: "juniors" },
+                { label: "Hijos Seniors Adicionados", key: "juniors_senior" },
+                { label: "Familia Adicionada (Papá/Nietos)", key: "papa_nieto" },
+                { label: "Familia Adicionada (Hermano/Sobrino)", key: "hermano_sobrino" }
+            ];
+
+            grupos.forEach(g => {
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = g.label;
+                adicData[g.key].items.forEach(it => {
+                    const opt = document.createElement('option');
+                    opt.value = it.factor;
+                    opt.textContent = `${it.concepto} (${it.pct})`;
+                    optGroup.appendChild(opt);
+                });
+                select.appendChild(optGroup);
+            });
+
+            select.value = "0";
+        }
+
+        function selectMembresia(membresiaKey) {
+            currentMembresia = membresiaKey;
+            currentType = 'fija';
+            updateActiveMenuClasses('menu-' + membresiaKey);
+            renderContent();
+        }
+
+        function selectTemporal(temporalId) {
+            currentMembresia = temporalId;
+            currentType = 'temporal';
+            updateActiveMenuClasses('menu-' + temporalId);
+            renderContent();
+        }
+
+        function selectAdicionadoDirecto(adicionadoKey) {
+            currentMembresia = adicionadoKey;
+            currentType = 'adicionado';
+            updateActiveMenuClasses('menu-adic-' + adicionadoKey);
+            renderContent();
+        }
+
+        function updateActiveMenuClasses(elementId) {
+            document.querySelectorAll('.menu-item, .sub-item, .sub-item-adic').forEach(el => {
+                el.classList.remove('border-red-600', 'bg-red-50', 'text-red-700');
+                if (el.classList.contains('menu-item') || el.classList.contains('sub-item-adic')) {
+                    el.classList.add('border-transparent');
+                }
+            });
+
+            const activeEl = document.getElementById(elementId);
+            if (activeEl) {
+                activeEl.classList.add('border-red-600', 'bg-red-50', 'text-red-700');
+                activeEl.classList.remove('border-transparent');
+            }
+        }
+
+        function toggleTemporalSubmenu() {
+            const submenu = document.getElementById('temporal-submenu');
+            const arrow = document.getElementById('temporal-arrow');
+            submenu.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function toggleAdicionadosSubmenu() {
+            const submenu = document.getElementById('adicionados-submenu');
+            const arrow = document.getElementById('adicionados-arrow');
+            submenu.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function renderContent() {
+            if (currentType === 'adicionado') {
+                const infoAdic = data[currentSede].adicionados[currentMembresia];
+                
+                let filasTabla = infoAdic.items.map(item => `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td class="py-3 px-4 font-semibold text-slate-800 text-sm md:text-base">${item.concepto}</td>
+                        <td class="py-3 px-4 text-center font-bold text-red-600 text-sm md:text-base">${item.pct}</td>
+                        <td class="py-3 px-4 text-right font-black text-slate-900 text-base md:text-lg">${formatter.format(item.mantenimiento)}</td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('content-display').innerHTML = `
+                    <h3 class="text-xl font-black text-slate-800 mb-2 uppercase border-b-2 border-red-600 pb-2">${infoAdic.titulo}</h3>
+                    <p class="text-xs text-slate-500 mb-4">${infoAdic.nota}</p>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 mt-4">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 uppercase text-xs font-bold tracking-wider">
+                                    <th class="py-3 px-4">Concepto / Categoría</th>
+                                    <th class="py-3 px-4 text-center">% Cuota Base</th>
+                                    <th class="py-3 px-4 text-right">Cuota Mensual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filasTabla}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                document.getElementById('cost-display').innerHTML = `
+                    <div class="bg-red-600 p-5 text-center flex flex-col justify-center">
+                        <span class="text-xs uppercase tracking-wider text-red-100 font-semibold">Inversión Inicial</span>
+                        <span class="text-2xl md:text-3xl font-black mt-1">$0</span>
+                        <span class="text-[11px] block text-red-200 mt-1">Sin costo por acción</span>
+                    </div>
+                    <div class="bg-slate-900 p-5 text-center flex flex-col justify-center border-l border-slate-800">
+                        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Tipo de Cuota</span>
+                        <span class="text-xl md:text-2xl font-black mt-1 text-white">Porcentual Mensual</span>
+                        <span class="text-[11px] block text-slate-400 mt-1">Sumatoria al mantenimiento titular</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // Membresías Regulares
+            let info;
+            if (currentType === 'fija') {
+                info = data[currentSede][currentMembresia];
+            } else {
+                info = data[currentSede].temporales.find(t => t.id === currentMembresia);
+            }
+            
+            let beneficiosHTML = '';
+            info.beneficios.forEach(b => {
+                beneficiosHTML += `
+                    <div class="flex items-start space-x-4 border-b border-slate-100 pb-4 last:border-0">
+                        <span class="text-red-600 font-bold text-xl mt-0.5">•</span>
+                        <p class="text-slate-700 font-medium text-base md:text-lg">${b}</p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('content-display').innerHTML = `
+                <h3 class="text-xl font-black text-slate-800 mb-6 uppercase border-b-2 border-red-600 pb-2">${info.titulo}</h3>
+                <div class="space-y-4">
+                    ${beneficiosHTML}
+                </div>
+            `;
+
+            let inversionStr = formatter.format(info.inversion);
+            let mantenimientoStr = "";
+            let extraAdicionadoHTML = "";
+            
+            if (typeof info.mantenimiento === 'number') {
+                let mantBase = info.mantenimiento;
+                let factorAdicionado = parseFloat(document.getElementById('select-adicionado').value) || 0;
+                
+                if (factorAdicionado > 0) {
+                    let costoExtra = mantBase * factorAdicionado;
+                    let mantTotal = mantBase + costoExtra;
+                    
+                    mantenimientoStr = `
+                        <div class="flex flex-col items-center">
+                            <span class="text-xl md:text-2xl font-black mt-1 line-through text-slate-500">${formatter.format(mantBase)}</span>
+                            <span class="text-2xl md:text-3xl font-black text-white">${formatter.format(mantTotal)}</span>
+                        </div>
+                    `;
+                    extraAdicionadoHTML = `<span class="text-[11px] block text-green-400 mt-1">Incluye +${formatter.format(costoExtra)} de Adicionado</span>`;
+                } else {
+                    mantenimientoStr = `<span class="text-2xl md:text-3xl font-black mt-1">${formatter.format(mantBase)}</span>`;
+                }
+            } else {
+                mantenimientoStr = `<span class="text-xl font-black mt-1">${info.mantenimiento}</span>`;
+                if(parseFloat(document.getElementById('select-adicionado').value) > 0) {
+                     extraAdicionadoHTML = `<span class="text-[11px] block text-yellow-400 mt-1">Cálculo manual requerido por tipo de paquete</span>`;
+                }
+            }
+
+            document.getElementById('cost-display').innerHTML = `
+                <div class="bg-red-600 p-5 text-center flex flex-col justify-center">
+                    <span class="text-xs uppercase tracking-wider text-red-100 font-semibold">Inversión</span>
+                    <span class="text-2xl md:text-3xl font-black mt-1">${inversionStr}</span>
+                </div>
+                <div class="bg-slate-900 p-5 text-center flex flex-col justify-center border-l border-slate-800 relative">
+                    <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Mantenimiento Mensual</span>
+                    ${mantenimientoStr}
+                    ${extraAdicionadoHTML}
+                </div>
+            `;
+        }
+
+        // Inicializar
+        buildTemporalMenu();
+        buildSimuladorSelect();
+        selectMembresia('vitalicia');
+    </script>
+</body>
+</html>
