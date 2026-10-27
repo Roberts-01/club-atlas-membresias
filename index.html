@@ -52,7 +52,7 @@
                         </div>
                     </div>
 
-                    <!-- Menú Desplegable ADICIONADOS -->
+                    <!-- Menú Desplegable ADICIONADOS (Abierto por defecto) -->
                     <div>
                         <button onclick="toggleAdicionadosSubmenu()" class="w-full text-left bg-white font-black text-slate-900 py-3 px-4 rounded shadow-sm hover:bg-slate-50 transition flex justify-between items-center border-l-4 border-transparent">
                             <span>ADICIONADOS</span>
@@ -76,13 +76,13 @@
                 </nav>
             </div>
 
-            <!-- Bloque Simulador Dinámico según la Sede (Con listado múltiple) -->
+            <!-- Bloque Simulador Dinámico (Con carrito de compras) -->
             <div id="simulador-container" class="bg-slate-200 p-3 rounded border border-slate-400 mt-2">
                 <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wide mb-2">Simulador de Adicionados:</label>
                 
                 <div class="flex flex-col gap-2">
                     <select id="select-adic-tipo" class="w-full bg-white border border-slate-300 text-slate-700 text-[11px] rounded focus:ring-red-500 focus:border-red-500 block p-2">
-                        <option value="0" data-nombre="Ninguno">Seleccionar Adicionado...</option>
+                        <!-- Llenado automático vía JavaScript -->
                     </select>
                     <div class="flex gap-2">
                         <input type="number" id="input-adic-cant" value="1" min="1" class="w-1/3 bg-white border border-slate-300 text-slate-700 text-xs rounded focus:ring-red-500 focus:border-red-500 block p-2 text-center" placeholder="Cant.">
@@ -95,7 +95,7 @@
                     <!-- Se inyecta dinámicamente -->
                 </div>
                 
-                <p class="text-[10px] text-slate-500 mt-2 leading-tight">Suma múltiples perfiles (ej. 2 juniors + 1 papá) para ver el impacto en la cuota activa.</p>
+                <p class="text-[10px] text-slate-500 mt-2 leading-tight">Suma múltiples perfiles y cuotas corporativas para ver el impacto en la cuota activa.</p>
             </div>
         </aside>
 
@@ -145,7 +145,7 @@
             maximumFractionDigits: 2
         });
 
-        // Arreglo para guardar el "carrito" de adicionados seleccionados
+        // Arreglo para guardar el "carrito" de adicionados
         var simuladorItems = [];
 
         var data = {
@@ -365,6 +365,72 @@
             if (!select) return;
             select.innerHTML = '<option value="0" data-nombre="Ninguno">Seleccionar Adicionado...</option>';
 
+            // ============================================
+            // 1. BLOQUE CUOTA CORPORATIVA ESTRUCTURADO
+            // ============================================
+            
+            // Título Principal (Negritas)
+            var optCorpTitle = document.createElement('option');
+            optCorpTitle.disabled = true;
+            optCorpTitle.style.fontWeight = "bold";
+            optCorpTitle.style.color = "black";
+            optCorpTitle.innerHTML = "Cuota Corporativa";
+            select.appendChild(optCorpTitle);
+
+            // - Colomos
+            var optColTitle = document.createElement('option');
+            optColTitle.disabled = true;
+            optColTitle.style.fontWeight = "bold";
+            optColTitle.innerHTML = "&nbsp;&nbsp;Colomos";
+            select.appendChild(optColTitle);
+            
+            var optColFam = document.createElement('option');
+            optColFam.value = "0.75";
+            optColFam.setAttribute('data-nombre', 'Corp. Familiar (Colomos)');
+            optColFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75%";
+            select.appendChild(optColFam);
+
+            // - Chapalita
+            var optChapTitle = document.createElement('option');
+            optChapTitle.disabled = true;
+            optChapTitle.style.fontWeight = "bold";
+            optChapTitle.innerHTML = "&nbsp;&nbsp;Chapalita";
+            select.appendChild(optChapTitle);
+
+            var optChapFam = document.createElement('option');
+            optChapFam.value = "0.75";
+            optChapFam.setAttribute('data-nombre', 'Corp. Familiar (Chapalita)');
+            optChapFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75%";
+            select.appendChild(optChapFam);
+
+            var optChapInd = document.createElement('option');
+            optChapInd.value = "1.00";
+            optChapInd.setAttribute('data-nombre', 'Corp. Individual (Chapalita)');
+            optChapInd.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Individual 100%";
+            select.appendChild(optChapInd);
+
+            // - Country
+            var optCounTitle = document.createElement('option');
+            optCounTitle.disabled = true;
+            optCounTitle.style.fontWeight = "bold";
+            optCounTitle.innerHTML = "&nbsp;&nbsp;Country";
+            select.appendChild(optCounTitle);
+
+            var optCounFam = document.createElement('option');
+            optCounFam.value = "0.75";
+            optCounFam.setAttribute('data-nombre', 'Corp. Familiar (Country)');
+            optCounFam.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Familiar 75%";
+            select.appendChild(optCounFam);
+
+            var optCounInd = document.createElement('option');
+            optCounInd.value = "0.75";
+            optCounInd.setAttribute('data-nombre', 'Corp. Individual (Country)');
+            optCounInd.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Mantenimiento Individual 75%";
+            select.appendChild(optCounInd);
+
+            // ============================================
+            // 2. BLOQUE DE ADICIONADOS DINÁMICOS POR SEDE
+            // ============================================
             var adicData = data[currentSede].adicionados;
             var grupos = [
                 { label: "Hijos Adicionados", key: "juniors" },
@@ -388,7 +454,7 @@
 
             select.value = "0";
             
-            // Limpiar la lista cada vez que se cambia de sede porque los precios cambian
+            // Limpiar la lista al cambiar de sede para evitar cálculos cruzados confusos
             simuladorItems = [];
             actualizarListaAdicionados();
         }
@@ -417,7 +483,7 @@
             select.value = "0";
             inputCant.value = "1";
 
-            // Forzar a vista de membresía normal para que se pueda ver la suma (si estaba viendo la tabla de adicionados)
+            // Forzar a vista de membresía normal para que se pueda ver la suma
             if (currentType === 'adicionado') {
                 selectMembresia('vitalicia');
             } else {
@@ -447,7 +513,7 @@
                             '<span class="text-[11px] text-slate-700 font-medium truncate pr-2" title="' + item.nombre + '">' + 
                                 '<b class="text-red-600">' + item.cant + 'x</b> ' + item.nombre + 
                             '</span>' +
-                            '<button onclick="removerAdicionadoSimulador(' + idx + ')" class="text-slate-400 hover:text-red-600 font-bold px-1 text-sm">&times;</button>' +
+                            '<button onclick="removerAdicionadoSimulador(' + idx + ')" class="text-slate-400 hover:text-red-600 font-bold px-1 text-sm transition">&times;</button>' +
                         '</div>';
             });
             container.innerHTML = html;
@@ -592,7 +658,7 @@
                             '<span class="text-xl md:text-2xl font-black mt-1 line-through text-slate-500">' + formatter.format(mantBase) + '</span>' +
                             '<span class="text-2xl md:text-3xl font-black text-white">' + formatter.format(mantTotal) + '</span>' +
                         '</div>';
-                    extraAdicionadoHTML = '<span class="text-[11px] block text-green-400 mt-1 leading-tight">Incluye +' + formatter.format(costoExtraTotal) + ' de Adicionados</span>';
+                    extraAdicionadoHTML = '<span class="text-[11px] block text-green-400 mt-1 leading-tight">Incluye +' + formatter.format(costoExtraTotal) + ' de Extras</span>';
                 } else {
                     mantenimientoStr = '<span class="text-2xl md:text-3xl font-black mt-1">' + formatter.format(mantBase) + '</span>';
                 }
