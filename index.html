@@ -16,6 +16,7 @@
         <h1 class="text-lg md:text-xl font-bold text-slate-700 tracking-wide">
             Consulta rápida de cuotas y conceptos autorizados
         </h1>
+        <!-- Botones de Sede -->
         <div class="flex justify-center space-x-3 mt-4">
             <button onclick="switchSede('chapalita')" id="btn-chapalita" class="sede-btn px-6 py-2 rounded-full font-bold text-sm transition-all shadow bg-red-600 text-white">Chapalita</button>
             <button onclick="switchSede('colomos')" id="btn-colomos" class="sede-btn px-6 py-2 rounded-full font-bold text-sm transition-all shadow bg-white text-slate-700 border border-slate-300 hover:bg-slate-50">Colomos</button>
@@ -23,11 +24,13 @@
         </div>
     </header>
 
-    <!-- Contenedor Principal -->
+    <!-- Contenedor Principal (Layout de 2 Columnas) -->
     <div class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 md:grid-cols-4 gap-6 items-start max-w-7xl">
 
         <!-- MENÚ LATERAL IZQUIERDO -->
         <aside class="bg-slate-300 rounded-lg shadow-inner p-3 md:col-span-1 border border-slate-400 flex flex-col gap-4">
+            
+            <!-- Bloque de Membresías -->
             <div>
                 <div class="bg-slate-600 text-white font-black text-center py-2.5 rounded uppercase tracking-wider mb-3 text-sm">
                     Membresías
@@ -122,7 +125,7 @@
             style: 'currency',
             currency: 'MXN',
             minimumFractionDigits: 0,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 0
         });
 
         var simuladorItems = [];
@@ -130,7 +133,7 @@
         var currentMembresia = 'vitalicia';
         var currentType = 'fija';
 
-        // BASE DE DATOS LOCAL (Se usa por defecto o como respaldo)
+        // BASE DE DATOS LOCAL (Precios redondeados)
         var data = {
             chapalita: {
                 vitalicia: { titulo: "VITALICIA - CHAPALITA", inversion: 500000, mantenimiento: 11690, beneficios: ["Incluye el matrimonio y todos los hijos menores de 25 años.", "Pueden adicionar familiares directos pagando un extra."] },
@@ -149,41 +152,41 @@
                         titulo: "HIJOS ADICIONADOS (JUNIORS) - CHAPALITA",
                         nota: "Calculado sobre la cuota mensual de mantenimiento vigente.",
                         items: [
-                            { concepto: "Junior de 25 a 29 años", factor: 0.15, pct: "15%", mantenimiento: 1753.50 },
-                            { concepto: "Junior de 30 a 34 años", factor: 0.25, pct: "25%", mantenimiento: 2922.50 },
-                            { concepto: "Junior de 35 años o más", factor: 0.30, pct: "30%", mantenimiento: 3507.00 },
-                            { concepto: "Junior casado hasta 40 años", factor: 0.60, pct: "60%", mantenimiento: 7014.00 }
+                            { concepto: "Junior de 25 a 29 años", factor: 0.15, pct: "15%", mantenimiento: 1754 },
+                            { concepto: "Junior de 30 a 34 años", factor: 0.25, pct: "25%", mantenimiento: 2923 },
+                            { concepto: "Junior de 35 años o más", factor: 0.30, pct: "30%", mantenimiento: 3507 },
+                            { concepto: "Junior casado hasta 40 años", factor: 0.60, pct: "60%", mantenimiento: 7014 }
                         ]
                     },
                     juniors_senior: {
                         titulo: "HIJOS SENIORS ADICIONADOS - CHAPALITA",
                         nota: "Calculado sobre la cuota mensual de mantenimiento vigente.",
                         items: [
-                            { concepto: "Junior Senior de 25 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3507.00 },
-                            { concepto: "Junior Senior de 30 a 34 años", factor: 0.50, pct: "50%", mantenimiento: 5845.00 },
-                            { concepto: "Junior Senior de 35 años o más", factor: 0.60, pct: "60%", mantenimiento: 7014.00 },
-                            { concepto: "Junior Senior casado hasta 40 años", factor: 1.00, pct: "100%", mantenimiento: 11690.00 }
+                            { concepto: "Junior Senior de 25 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3507 },
+                            { concepto: "Junior Senior de 30 a 34 años", factor: 0.50, pct: "50%", mantenimiento: 5845 },
+                            { concepto: "Junior Senior de 35 años o más", factor: 0.60, pct: "60%", mantenimiento: 7014 },
+                            { concepto: "Junior Senior casado hasta 40 años", factor: 1.00, pct: "100%", mantenimiento: 11690 }
                         ]
                     },
                     papa_nieto: {
                         titulo: "PAPÁ, NIETO Y NIETO SENIOR - CHAPALITA",
                         nota: "Extensión para ascendientes y nietos autorizados.",
                         items: [
-                            { concepto: "Papá", factor: 0.20, pct: "20%", mantenimiento: 2338.00 },
-                            { concepto: "Nieto hasta los 14 años", factor: 0.15, pct: "15%", mantenimiento: 1753.50 },
-                            { concepto: "Nieto de 15 a 24 años", factor: 0.30, pct: "30%", mantenimiento: 3507.00 },
-                            { concepto: "Nieto Senior hasta 14 años", factor: 0.30, pct: "30%", mantenimiento: 3507.00 }
+                            { concepto: "Papá", factor: 0.20, pct: "20%", mantenimiento: 2338 },
+                            { concepto: "Nieto hasta los 14 años", factor: 0.15, pct: "15%", mantenimiento: 1754 },
+                            { concepto: "Nieto de 15 a 24 años", factor: 0.30, pct: "30%", mantenimiento: 3507 },
+                            { concepto: "Nieto Senior hasta 14 años", factor: 0.30, pct: "30%", mantenimiento: 3507 }
                         ]
                     },
                     hermano_sobrino: {
                         titulo: "HERMANO / SOBRINO - CHAPALITA",
                         nota: "Adición de colaterales directos autorizados.",
                         items: [
-                            { concepto: "Hermano/Sobrino soltero de 03 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3507.00 },
-                            { concepto: "Hermano/Sobrino soltero de 30 a 34 años", factor: 0.40, pct: "40%", mantenimiento: 4676.00 },
-                            { concepto: "Hermano/Sobrino soltero más de 35 años", factor: 0.45, pct: "45%", mantenimiento: 5260.50 },
-                            { concepto: "Hermano/Sobrino casado hasta los 39 años", factor: 0.90, pct: "90%", mantenimiento: 10521.00 },
-                            { concepto: "Hermano/Sobrino casado más de 40 años", factor: 1.00, pct: "100%", mantenimiento: 11690.00 }
+                            { concepto: "Hermano/Sobrino soltero de 03 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3507 },
+                            { concepto: "Hermano/Sobrino soltero de 30 a 34 años", factor: 0.40, pct: "40%", mantenimiento: 4676 },
+                            { concepto: "Hermano/Sobrino soltero más de 35 años", factor: 0.45, pct: "45%", mantenimiento: 5261 },
+                            { concepto: "Hermano/Sobrino casado hasta los 39 años", factor: 0.90, pct: "90%", mantenimiento: 10521 },
+                            { concepto: "Hermano/Sobrino casado más de 40 años", factor: 1.00, pct: "100%", mantenimiento: 11690 }
                         ]
                     }
                 }
@@ -199,41 +202,41 @@
                         titulo: "HIJOS ADICIONADOS (JUNIORS) - COLOMOS",
                         nota: "Calculado sobre la cuota mensual de mantenimiento vigente.",
                         items: [
-                            { concepto: "Junior de 25 a 29 años", factor: 0.20, pct: "20%", mantenimiento: 2738.00 },
-                            { concepto: "Junior de 30 a 34 años", factor: 0.30, pct: "30%", mantenimiento: 4107.00 },
-                            { concepto: "Junior de 35 años o más", factor: 0.35, pct: "35%", mantenimiento: 4791.50 },
-                            { concepto: "Junior casado hasta 40 años", factor: 0.65, pct: "65%", mantenimiento: 8898.50 }
+                            { concepto: "Junior de 25 a 29 años", factor: 0.20, pct: "20%", mantenimiento: 2738 },
+                            { concepto: "Junior de 30 a 34 años", factor: 0.30, pct: "30%", mantenimiento: 4107 },
+                            { concepto: "Junior de 35 años o más", factor: 0.35, pct: "35%", mantenimiento: 4792 },
+                            { concepto: "Junior casado hasta 40 años", factor: 0.65, pct: "65%", mantenimiento: 8899 }
                         ]
                     },
                     juniors_senior: {
                         titulo: "HIJOS SENIORS ADICIONADOS - COLOMOS",
                         nota: "Calculado sobre la cuota mensual de mantenimiento vigente.",
                         items: [
-                            { concepto: "Junior Senior de 25 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 4107.00 },
-                            { concepto: "Junior Senior de 30 a 34 años", factor: 0.50, pct: "50%", mantenimiento: 6845.00 },
-                            { concepto: "Junior Senior de 35 años o más", factor: 0.60, pct: "60%", mantenimiento: 8214.00 },
-                            { concepto: "Junior Senior casado hasta 40 años", factor: 1.00, pct: "100%", mantenimiento: 13690.00 }
+                            { concepto: "Junior Senior de 25 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 4107 },
+                            { concepto: "Junior Senior de 30 a 34 años", factor: 0.50, pct: "50%", mantenimiento: 6845 },
+                            { concepto: "Junior Senior de 35 años o más", factor: 0.60, pct: "60%", mantenimiento: 8214 },
+                            { concepto: "Junior Senior casado hasta 40 años", factor: 1.00, pct: "100%", mantenimiento: 13690 }
                         ]
                     },
                     papa_nieto: {
                         titulo: "PAPÁ, NIETO Y NIETO SENIOR - COLOMOS",
                         nota: "Extensión para ascendientes y nietos autorizados.",
                         items: [
-                            { concepto: "Papá", factor: 0.30, pct: "30%", mantenimiento: 4107.00 },
-                            { concepto: "Nieto hasta los 14 años", factor: 0.15, pct: "15%", mantenimiento: 2053.50 },
-                            { concepto: "Nieto de 15 a 24 años", factor: 0.30, pct: "30%", mantenimiento: 4107.00 },
-                            { concepto: "Nieto Senior hasta 14 años", factor: 0.30, pct: "30%", mantenimiento: 4107.00 }
+                            { concepto: "Papá", factor: 0.30, pct: "30%", mantenimiento: 4107 },
+                            { concepto: "Nieto hasta los 14 años", factor: 0.15, pct: "15%", mantenimiento: 2054 },
+                            { concepto: "Nieto de 15 a 24 años", factor: 0.30, pct: "30%", mantenimiento: 4107 },
+                            { concepto: "Nieto Senior hasta 14 años", factor: 0.30, pct: "30%", mantenimiento: 4107 }
                         ]
                     },
                     hermano_sobrino: {
                         titulo: "HERMANO / SOBRINO - COLOMOS",
                         nota: "Adición de colaterales directos autorizados.",
                         items: [
-                            { concepto: "Hermano/Sobrino soltero de 03 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 4107.00 },
-                            { concepto: "Hermano/Sobrino soltero de 30 a 34 años", factor: 0.40, pct: "40%", mantenimiento: 5476.00 },
-                            { concepto: "Hermano/Sobrino soltero más de 35 años", factor: 0.45, pct: "45%", mantenimiento: 6160.50 },
-                            { concepto: "Hermano/Sobrino casado hasta los 39 años", factor: 1.00, pct: "100%", mantenimiento: 13690.00 },
-                            { concepto: "Hermano/Sobrino casado más de 40 años", factor: 1.00, pct: "100%", mantenimiento: 13690.00 }
+                            { concepto: "Hermano/Sobrino soltero de 03 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 4107 },
+                            { concepto: "Hermano/Sobrino soltero de 30 a 34 años", factor: 0.40, pct: "40%", mantenimiento: 5476 },
+                            { concepto: "Hermano/Sobrino soltero más de 35 años", factor: 0.45, pct: "45%", mantenimiento: 6161 },
+                            { concepto: "Hermano/Sobrino casado hasta los 39 años", factor: 1.00, pct: "100%", mantenimiento: 13690 },
+                            { concepto: "Hermano/Sobrino casado más de 40 años", factor: 1.00, pct: "100%", mantenimiento: 13690 }
                         ]
                     }
                 }
@@ -256,41 +259,41 @@
                         titulo: "HIJOS ADICIONADOS (JUNIORS) - COUNTRY",
                         nota: "Calculado sobre la cuota mensual de mantenimiento vigente.",
                         items: [
-                            { concepto: "Junior de 25 a 29 años", factor: 0.15, pct: "15%", mantenimiento: 1797.00 },
-                            { concepto: "Junior de 30 a 34 años", factor: 0.25, pct: "25%", mantenimiento: 2995.00 },
-                            { concepto: "Junior de 35 años o más", factor: 0.30, pct: "30%", mantenimiento: 3594.00 },
-                            { concepto: "Junior casado hasta 40 años", factor: 0.60, pct: "60%", mantenimiento: 7188.00 }
+                            { concepto: "Junior de 25 a 29 años", factor: 0.15, pct: "15%", mantenimiento: 1797 },
+                            { concepto: "Junior de 30 a 34 años", factor: 0.25, pct: "25%", mantenimiento: 2995 },
+                            { concepto: "Junior de 35 años o más", factor: 0.30, pct: "30%", mantenimiento: 3594 },
+                            { concepto: "Junior casado hasta 40 años", factor: 0.60, pct: "60%", mantenimiento: 7188 }
                         ]
                     },
                     juniors_senior: {
                         titulo: "HIJOS SENIORS ADICIONADOS - COUNTRY",
                         nota: "Calculado sobre la cuota mensual de mantenimiento vigente.",
                         items: [
-                            { concepto: "Junior Senior de 25 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3594.00 },
-                            { concepto: "Junior Senior de 30 a 34 años", factor: 0.50, pct: "50%", mantenimiento: 5990.00 },
-                            { concepto: "Junior Senior de 35 años o más", factor: 0.60, pct: "60%", mantenimiento: 7188.00 },
-                            { concepto: "Junior Senior casado hasta 40 años", factor: 1.00, pct: "100%", mantenimiento: 11980.00 }
+                            { concepto: "Junior Senior de 25 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3594 },
+                            { concepto: "Junior Senior de 30 a 34 años", factor: 0.50, pct: "50%", mantenimiento: 5990 },
+                            { concepto: "Junior Senior de 35 años o más", factor: 0.60, pct: "60%", mantenimiento: 7188 },
+                            { concepto: "Junior Senior casado hasta 40 años", factor: 1.00, pct: "100%", mantenimiento: 11980 }
                         ]
                     },
                     papa_nieto: {
                         titulo: "PAPÁ, NIETO Y NIETO SENIOR - COUNTRY",
                         nota: "Extensión para ascendientes y nietos autorizados.",
                         items: [
-                            { concepto: "Papá", factor: 0.20, pct: "20%", mantenimiento: 2396.00 },
-                            { concepto: "Nieto hasta los 14 años", factor: 0.15, pct: "15%", mantenimiento: 1797.00 },
-                            { concepto: "Nieto de 15 a 24 años", factor: 0.30, pct: "30%", mantenimiento: 3594.00 },
-                            { concepto: "Nieto Senior hasta 14 años", factor: 0.30, pct: "30%", mantenimiento: 3594.00 }
+                            { concepto: "Papá", factor: 0.20, pct: "20%", mantenimiento: 2396 },
+                            { concepto: "Nieto hasta los 14 años", factor: 0.15, pct: "15%", mantenimiento: 1797 },
+                            { concepto: "Nieto de 15 a 24 años", factor: 0.30, pct: "30%", mantenimiento: 3594 },
+                            { concepto: "Nieto Senior hasta 14 años", factor: 0.30, pct: "30%", mantenimiento: 3594 }
                         ]
                     },
                     hermano_sobrino: {
                         titulo: "HERMANO / SOBRINO - COUNTRY",
                         nota: "Adición de colaterales directos autorizados.",
                         items: [
-                            { concepto: "Hermano/Sobrino soltero de 03 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3594.00 },
-                            { concepto: "Hermano/Sobrino soltero de 30 a 34 años", factor: 0.40, pct: "40%", mantenimiento: 4792.00 },
-                            { concepto: "Hermano/Sobrino soltero más de 35 años", factor: 0.45, pct: "45%", mantenimiento: 5391.00 },
-                            { concepto: "Hermano/Sobrino casado hasta los 39 años", factor: 0.90, pct: "90%", mantenimiento: 10782.00 },
-                            { concepto: "Hermano/Sobrino casado más de 40 años", factor: 1.00, pct: "100%", mantenimiento: 11980.00 }
+                            { concepto: "Hermano/Sobrino soltero de 03 a 29 años", factor: 0.30, pct: "30%", mantenimiento: 3594 },
+                            { concepto: "Hermano/Sobrino soltero de 30 a 34 años", factor: 0.40, pct: "40%", mantenimiento: 4792 },
+                            { concepto: "Hermano/Sobrino soltero más de 35 años", factor: 0.45, pct: "45%", mantenimiento: 5391 },
+                            { concepto: "Hermano/Sobrino casado hasta los 39 años", factor: 0.90, pct: "90%", mantenimiento: 10782 },
+                            { concepto: "Hermano/Sobrino casado más de 40 años", factor: 1.00, pct: "100%", mantenimiento: 11980 }
                         ]
                     }
                 }
@@ -503,8 +506,12 @@
                 var mantBase = info.mantenimiento;
                 var costoExtraTotal = 0;
                 simuladorItems.forEach(function(it) {
-                    if (it.tipo === 'fijo') costoExtraTotal += (it.valor * it.cant);
-                    else costoExtraTotal += (mantBase * it.valor * it.cant);
+                    if (it.tipo === 'fijo') {
+                        costoExtraTotal += (it.valor * it.cant);
+                    } else {
+                        // Calcula el porcentaje redondeado a entero exacto por cada uno, luego multiplica por cantidad
+                        costoExtraTotal += Math.round(mantBase * it.valor) * it.cant;
+                    }
                 });
                 
                 if (costoExtraTotal > 0) {
