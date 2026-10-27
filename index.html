@@ -386,3 +386,147 @@
 
             var activeEl = document.getElementById(elementId);
             if (activeEl) {
+                activeEl.classList.add('border-red-600', 'bg-red-50', 'text-red-700');
+                activeEl.classList.remove('border-transparent');
+            }
+        }
+
+        function toggleTemporalSubmenu() {
+            var submenu = document.getElementById('temporal-submenu');
+            var arrow = document.getElementById('temporal-arrow');
+            if (submenu) submenu.classList.toggle('hidden');
+            if (arrow) arrow.classList.toggle('rotate-180');
+        }
+
+        function toggleAdicionadosSubmenu() {
+            var submenu = document.getElementById('adicionados-submenu');
+            var arrow = document.getElementById('adicionados-arrow');
+            if (submenu) submenu.classList.toggle('hidden');
+            if (arrow) arrow.classList.toggle('rotate-180');
+        }
+
+        function renderContent() {
+            var contentDisplay = document.getElementById('content-display');
+            var costDisplay = document.getElementById('cost-display');
+            if (!contentDisplay || !costDisplay) return;
+
+            // Sub-categorías de adicionados
+            if (currentType === 'adicionado') {
+                var infoAdic = data[currentSede].adicionados[currentMembresia];
+                
+                var filasTabla = infoAdic.items.map(function(item) {
+                    return '<tr class="border-b border-slate-100 hover:bg-slate-50 transition">' +
+                        '<td class="py-3 px-4 font-semibold text-slate-800 text-sm md:text-base">' + item.concepto + '</td>' +
+                        '<td class="py-3 px-4 text-center font-bold text-red-600 text-sm md:text-base">' + item.pct + '</td>' +
+                        '<td class="py-3 px-4 text-right font-black text-slate-900 text-base md:text-lg">' + formatter.format(item.mantenimiento) + '</td>' +
+                    '</tr>';
+                }).join('');
+
+                contentDisplay.innerHTML = 
+                    '<h3 class="text-xl font-black text-slate-800 mb-2 uppercase border-b-2 border-red-600 pb-2">' + infoAdic.titulo + '</h3>' +
+                    '<p class="text-xs text-slate-500 mb-4">' + infoAdic.nota + '</p>' +
+                    '<div class="overflow-x-auto rounded-lg border border-slate-200 mt-4">' +
+                        '<table class="w-full text-left border-collapse">' +
+                            '<thead>' +
+                                '<tr class="bg-slate-100 text-slate-600 uppercase text-xs font-bold tracking-wider">' +
+                                    '<th class="py-3 px-4">Concepto / Categoría</th>' +
+                                    '<th class="py-3 px-4 text-center">% Cuota Base</th>' +
+                                    '<th class="py-3 px-4 text-right">Cuota Mensual</th>' +
+                                '</tr>' +
+                            '</thead>' +
+                            '<tbody>' + filasTabla + '</tbody>' +
+                        '</table>' +
+                    '</div>';
+
+                costDisplay.innerHTML = 
+                    '<div class="bg-red-600 p-5 text-center flex flex-col justify-center">' +
+                        '<span class="text-xs uppercase tracking-wider text-red-100 font-semibold">Inversión Inicial</span>' +
+                        '<span class="text-2xl md:text-3xl font-black mt-1">$0</span>' +
+                        '<span class="text-[11px] block text-red-200 mt-1">Sin costo por acción</span>' +
+                    '</div>' +
+                    '<div class="bg-slate-900 p-5 text-center flex flex-col justify-center border-l border-slate-800">' +
+                        '<span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Tipo de Cuota</span>' +
+                        '<span class="text-xl md:text-2xl font-black mt-1 text-white">Porcentual Mensual</span>' +
+                        '<span class="text-[11px] block text-slate-400 mt-1">Sumatoria al mantenimiento titular</span>' +
+                    '</div>';
+                return;
+            }
+
+            // Membresías regulares
+            var info;
+            if (currentType === 'fija') {
+                info = data[currentSede][currentMembresia];
+            } else {
+                info = data[currentSede].temporales.find(function(t) { return t.id === currentMembresia; });
+            }
+            
+            var beneficiosHTML = '';
+            info.beneficios.forEach(function(b) {
+                beneficiosHTML += 
+                    '<div class="flex items-start space-x-4 border-b border-slate-100 pb-4 last:border-0">' +
+                        '<span class="text-red-600 font-bold text-xl mt-0.5">•</span>' +
+                        '<p class="text-slate-700 font-medium text-base md:text-lg">' + b + '</p>' +
+                    '</div>';
+            });
+
+            contentDisplay.innerHTML = 
+                '<h3 class="text-xl font-black text-slate-800 mb-6 uppercase border-b-2 border-red-600 pb-2">' + info.titulo + '</h3>' +
+                '<div class="space-y-4">' + beneficiosHTML + '</div>';
+
+            var inversionStr = formatter.format(info.inversion);
+            var mantenimientoStr = "";
+            var extraAdicionadoHTML = "";
+            
+            var selectAdic = document.getElementById('select-adicionado');
+            var factorAdicionado = selectAdic ? (parseFloat(selectAdic.value) || 0) : 0;
+
+            if (typeof info.mantenimiento === 'number') {
+                var mantBase = info.mantenimiento;
+                
+                if (factorAdicionado > 0) {
+                    var costoExtra = mantBase * factorAdicionado;
+                    var mantTotal = mantBase + costoExtra;
+                    
+                    mantenimientoStr = 
+                        '<div class="flex flex-col items-center">' +
+                            '<span class="text-xl md:text-2xl font-black mt-1 line-through text-slate-500">' + formatter.format(mantBase) + '</span>' +
+                            '<span class="text-2xl md:text-3xl font-black text-white">' + formatter.format(mantTotal) + '</span>' +
+                        '</div>';
+                    extraAdicionadoHTML = '<span class="text-[11px] block text-green-400 mt-1">Incluye +' + formatter.format(costoExtra) + ' de Adicionado</span>';
+                } else {
+                    mantenimientoStr = '<span class="text-2xl md:text-3xl font-black mt-1">' + formatter.format(mantBase) + '</span>';
+                }
+            } else {
+                mantenimientoStr = '<span class="text-xl font-black mt-1">' + info.mantenimiento + '</span>';
+                if (factorAdicionado > 0) {
+                     extraAdicionadoHTML = '<span class="text-[11px] block text-yellow-400 mt-1">Cálculo manual requerido por tipo de paquete</span>';
+                }
+            }
+
+            costDisplay.innerHTML = 
+                '<div class="bg-red-600 p-5 text-center flex flex-col justify-center">' +
+                    '<span class="text-xs uppercase tracking-wider text-red-100 font-semibold">Inversión</span>' +
+                    '<span class="text-2xl md:text-3xl font-black mt-1">' + inversionStr + '</span>' +
+                '</div>' +
+                '<div class="bg-slate-900 p-5 text-center flex flex-col justify-center border-l border-slate-800 relative">' +
+                    '<span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Mantenimiento Mensual</span>' +
+                    mantenimientoStr +
+                    extraAdicionadoHTML +
+                '</div>';
+        }
+
+        // Inicialización segura del sistema
+        function initApp() {
+            buildTemporalMenu();
+            buildSimuladorSelect();
+            selectMembresia('vitalicia');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
